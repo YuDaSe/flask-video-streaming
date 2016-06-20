@@ -3,13 +3,13 @@ from flask import Flask, render_template, Response, send_from_directory, jsonify
 import serial
 
 # emulated camera
-from camera import Camera
+# from camera import Camera
 
 from classes.TrackControl import TrackControl
 import serialDevice
 
 # Raspberry Pi camera module (requires picamera package)
-# from camera_pi import Camera
+from camera_pi import Camera
 
 ser = serial.Serial(serialDevice.DEV, 9600)
 
