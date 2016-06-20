@@ -1,0 +1,19 @@
+{
+  "name": "flask-video-streaming-rower-cam",
+  "version": "0.0.0",
+  "homepage": "https://github.com/YuDaSe/flask-video-streaming",
+  "authors": [
+    "Yuriy"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~3.0.0"
+  }
+}

@@ -1,9 +1,60 @@
 <html>
   <head>
     <title>Video Streaming Demonstration</title>
+
+    <script type="text/javascript" src="/static/bower_components/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/app/main.js"></script>
+
+    <style type="text/css">
+    	body {
+    		margin: 0;
+    		padding: 0;
+    		background: #000;
+    	}
+
+    	.controls {
+    		position: absolute;
+    		height: 100vh;
+    		width: 100vw;
+    		top: 0;
+    	}
+
+    	.controls button {
+    		background: none;
+    		border: none;
+    		font-size: 10vh;
+    		color: #fff;
+    	}
+
+    	.right {
+    		float: right;
+    		margin-top: 30vh;
+    	}
+
+    	.left {
+    		float: left;
+    		margin-top: 30vh;
+    	}
+
+    	.cam {
+    		width: 100%;
+    		border: none;
+    	}
+    </style>
   </head>
   <body>
-    <h1>Video Streaming Demonstration</h1>
-    <img src="{{ url_for('video_feed') }}">
+    <img class="cam" src="{{ url_for('video_feed') }}">
+    <div class="controls">
+    	<div class="right">
+    		<button data-track="right" data-increament="1">&uarr;</button>
+    		<br/>
+    		<button data-track="right" data-increament="-1">&darr;</button>
+    	</div>
+    	<div class="left">
+    		<button data-track="left" data-increament="1">&uarr;</button>
+    		<br/>
+    		<button data-track="left" data-increament="-1">&darr;</button>
+    	</div>
+    </div>
   </body>
 </html>

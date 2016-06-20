@@ -1,14 +1,19 @@
 #!/usr/bin/env python
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, send_from_directory, jsonify, request, g
+import serial
 
 # emulated camera
 from camera import Camera
 
+from classes.TrackControl import TrackControl
+import serialDevice
+
 # Raspberry Pi camera module (requires picamera package)
 # from camera_pi import Camera
 
-app = Flask(__name__)
+ser = serial.Serial(serialDevice.DEV, 9600)
 
+app = Flask(__name__)
 
 @app.route('/')
 def index():
@@ -29,6 +34,29 @@ def video_feed():
     """Video streaming route. Put this in the src attribute of an img tag."""
     return Response(gen(Camera()),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/control', methods=['POST'])
+def control():
+    trackControl = getattr(g, '_trackControl', None)
+    if trackControl is None:
+        trackControl = g._trackControl = TrackControl(0,0)
+
+    trackControl.setLeft(int(request.form.get('left')))
+    trackControl.setRight(int(request.form.get('right')))
+
+    ser.write(trackControl.getSerialMessage())
+
+    return jsonify(left=trackControl.getLeft(),
+        right=trackControl.getRight())
+
+@app.route('/control', methods=['GET'])
+def get_control():
+    trackControl = getattr(g, '_trackControl', None)
+    if trackControl is None:
+        trackControl = g._trackControl = TrackControl(0,0)
+
+    return jsonify(left=trackControl.getLeft(),
+        right=trackControl.getRight())
 
 
 if __name__ == '__main__':
