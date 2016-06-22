@@ -14,4 +14,4 @@ class TestTrackControl(unittest.TestCase):
 
     def test_serial_message(self):
     	tc = TrackControl(0, 0)
-    	self.assertEqual(tc.getSerialMessage(), 'left:5;right:5')
+    	self.assertEqual(tc.getSerialMessage(), 'action:0;left:5;right:5')

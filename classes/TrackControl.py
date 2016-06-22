@@ -7,10 +7,19 @@ class TrackControl(object):
 	MAX_RIGHT= 5
 	MIN_RIGHT= -5
 
+	"""
+	Possible actions
+	MANEUVER = 1
+	CONTROL = 0
+	"""
+
+	ACTION_CONTROL = 0
+
 	def __init__(self, left, right):
 		super(TrackControl, self).__init__()
-		self.left = left
-		self.right = right
+		self.action = self.ACTION_CONTROL
+		self.setLeft(left)
+		self.setRight(right)
 
 	def setLeft(self, left):
 		if left <= self.MAX_LEFT and left >= self.MIN_LEFT:
@@ -27,4 +36,7 @@ class TrackControl(object):
 		return self.right
 
 	def getSerialMessage(self):
-		return 'left:{left};right:{right}'.format(left=self.left + 5, right=self.right + 5)
+		return 'action:{action};left:{left};right:{right}'.format(
+			left=self.left + 5,
+			right=self.right + 5,
+			action=self.action)

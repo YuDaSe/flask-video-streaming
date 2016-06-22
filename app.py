@@ -35,11 +35,24 @@ def video_feed():
     return Response(gen(Camera()),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
+@app.route('/maneuver', methods=['POST'])
+def maneuver():
+    trackControl = getTreackControl()
+
+    tm = TrackManeuver(
+        request.form.get('track'),
+        int(request.form.get('duration')),
+        int(request.form.get('delta'))
+    )
+
+    ser.write(tm.getSerialMessage())
+
+    return jsonify(left=trackControl.getLeft(),
+        right=trackControl.getRight())
+
 @app.route('/control', methods=['POST'])
 def control():
-    trackControl = getattr(g, '_trackControl', None)
-    if trackControl is None:
-        trackControl = g._trackControl = TrackControl(0,0)
+    trackControl = getTreackControl()
 
     trackControl.setLeft(int(request.form.get('left')))
     trackControl.setRight(int(request.form.get('right')))
@@ -51,13 +64,17 @@ def control():
 
 @app.route('/control', methods=['GET'])
 def get_control():
-    trackControl = getattr(g, '_trackControl', None)
-    if trackControl is None:
-        trackControl = g._trackControl = TrackControl(0,0)
+    trackControl = getTreackControl()
 
     return jsonify(left=trackControl.getLeft(),
         right=trackControl.getRight())
 
+def getTreackControl():
+    trackControl = getattr(g, '_trackControl', None)
+    if trackControl is None:
+        trackControl = g._trackControl = TrackControl(0,0)
+
+    return trackControl
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True, threaded=True)

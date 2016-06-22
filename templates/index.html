@@ -46,14 +46,24 @@
     <img class="cam" src="{{ url_for('video_feed') }}">
     <div class="controls">
     	<div class="right">
+            <button class="turnRight">></button>
+            <br/>
     		<button data-track="right" data-increament="1">&uarr;</button>
     		<br/>
     		<button data-track="right" data-increament="-1">&darr;</button>
+            <br/>
+            <button class="go">GO</button>
     	</div>
     	<div class="left">
+            <button class="turnLeft"><</button>
+            <br/>
     		<button data-track="left" data-increament="1">&uarr;</button>
     		<br/>
     		<button data-track="left" data-increament="-1">&darr;</button>
+            <br/>
+            <button class="stop">STOP</button>
+            <br/>
+            <button class="back">Back</button>
     	</div>
     </div>
   </body>
