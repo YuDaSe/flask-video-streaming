@@ -1,19 +1,24 @@
 #!/usr/bin/env python
 from flask import Flask, render_template, Response, send_from_directory, jsonify, request, g
-import serial
+from flask_socketio import SocketIO, send, emit
 
-# emulated camera
-# from camera import Camera
+# emulated
+#from camera import Camera
+#import serial_mock as serial
 
 from classes.TrackControl import TrackControl
+from classes.TrackManeuver import TrackManeuver
 import serialDevice
 
 # Raspberry Pi camera module (requires picamera package)
 from camera_pi import Camera
+import serial
 
 ser = serial.Serial(serialDevice.DEV, 9600)
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app)
 
 @app.route('/')
 def index():
@@ -35,32 +40,30 @@ def video_feed():
     return Response(gen(Camera()),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@app.route('/maneuver', methods=['POST'])
-def maneuver():
+@socketio.on('maneuver')
+def maneuver(maneuver):
     trackControl = getTreackControl()
 
     tm = TrackManeuver(
-        request.form.get('track'),
-        int(request.form.get('duration')),
-        int(request.form.get('delta'))
+        maneuver['track'],
+        maneuver['duration'],
+        maneuver['delta']
     )
 
     ser.write(tm.getSerialMessage())
 
-    return jsonify(left=trackControl.getLeft(),
-        right=trackControl.getRight())
+    send(trackControl.to_json(), json=True)
 
-@app.route('/control', methods=['POST'])
-def control():
+@socketio.on('control_setup')
+def control(control):
     trackControl = getTreackControl()
 
-    trackControl.setLeft(int(request.form.get('left')))
-    trackControl.setRight(int(request.form.get('right')))
+    trackControl.setLeft(control['left'])
+    trackControl.setRight(control['right'])
 
     ser.write(trackControl.getSerialMessage())
 
-    return jsonify(left=trackControl.getLeft(),
-        right=trackControl.getRight())
+    send(trackControl.to_json(), json=True)
 
 @app.route('/control', methods=['GET'])
 def get_control():
@@ -77,4 +80,5 @@ def getTreackControl():
     return trackControl
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True, threaded=True)
+    #app.run(host='0.0.0.0', debug=True, threaded=True)
+    socketio.run(app)

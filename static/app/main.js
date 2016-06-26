@@ -8,6 +8,8 @@ $(function() {
 
 	var waiting = false;
 
+	var socket = io('/');
+
 	$.get('/control')
 	.then(controllCallback);
 
@@ -16,13 +18,10 @@ $(function() {
 
 		var button = e.target;
 
-		waiting = true;
-
 		rowerWheals[button.getAttribute("data-track")] += Number(
 			button.getAttribute("data-increament"));
 
-		$.post('/control', rowerWheals)
-		.then(controllCallback);
+		getCommandSender(rowerWheals)();
 	});
 
 	$('.go').on('click', getCommandSender({left: 1, right: 1}));
@@ -35,28 +34,27 @@ $(function() {
 		duration: 1000,
 		delta: 1,
 		track: "right"
-	}, '/maneuver'));
+	}, 'maneuver'));
 
 	$('.turnLeft').on('click', getCommandSender({
 		duration: 1000,
 		delta: 1,
 		track: "left"
-	}, '/maneuver'));
+	}, 'maneuver'));
 
 	function controllCallback(data) {
-		rowerWheals = data;
+		rowerWheals = JSON.parse(data);
 
 		waiting = false;
 	}
 
 	function getCommandSender(command, action) {
-		action = action || '/control';
+		action = action || 'control_setup';
 
 		return function() {
-			waiting = true;
-
-			$.post(action, command)
-			.then(controllCallback);
+			socket.emit(action, command);
 		}
 	}
+
+	socket.on('message', controllCallback);
 });
